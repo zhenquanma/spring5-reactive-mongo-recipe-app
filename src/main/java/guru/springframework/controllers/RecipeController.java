@@ -35,7 +35,7 @@ public class RecipeController {
     @GetMapping("/{id}/show")
     public String showById(@PathVariable String id, Model model){
 
-        model.addAttribute("recipe", recipeService.findById(id));
+        model.addAttribute("recipe", recipeService.findById(id).block());
 
         return "recipe/show";
     }
@@ -55,7 +55,7 @@ public class RecipeController {
 
     @GetMapping("/{id}/update")
     public String updateRecipe(@PathVariable String id, Model model){
-        RecipeCommand recipe = recipeService.findCommandById(id);
+        RecipeCommand recipe = recipeService.findCommandById(id).block();
         List<String> categoryIds = new ArrayList<>();
         recipe.getCategories().iterator().forEachRemaining(category -> categoryIds.add(category.getId()));
         model.addAttribute("recipe", recipe);
@@ -82,7 +82,7 @@ public class RecipeController {
         for(int i = 0; i < categoryId.length; i++){
             command.getCategories().add(categoryService.findCommandById(categoryId[i]));
         }
-        RecipeCommand savedCommand = recipeService.saveRecipeCommand(command);
+        RecipeCommand savedCommand = recipeService.saveRecipeCommand(command).block();
 
         return "redirect:/recipe/" + savedCommand.getId() + "/show";
     }
@@ -91,7 +91,7 @@ public class RecipeController {
     public String deleteCommand(@PathVariable String id) {
         log.debug("Deleting Recipe ID: " + id);
 
-        recipeService.deleteById(id);
+        recipeService.deleteById(id).block();
 
         return "redirect:/";
     }

@@ -35,7 +35,7 @@ public class IngredientController {
     public String listIngredients(@PathVariable String recipeId, Model model) {
         log.debug("Getting ingredients for recipe id: " + recipeId);
 
-        model.addAttribute("recipe", recipeService.findCommandById(recipeId));
+        model.addAttribute("recipe", recipeService.findCommandById(recipeId).block());
 
         return "recipe/ingredient/list";
     }
@@ -54,7 +54,7 @@ public class IngredientController {
     @GetMapping("recipe/{recipeId}/ingredients/new")
     public String newIngredient(@PathVariable String recipeId, Model model) {
 
-        RecipeCommand recipeCommand = recipeService.findCommandById(recipeId);
+        RecipeCommand recipeCommand = recipeService.findCommandById(recipeId).block();
 
         if(recipeCommand == null){
             throw new RuntimeException("RECIPE NOT FOUND: " + recipeId);

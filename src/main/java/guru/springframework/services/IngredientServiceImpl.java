@@ -102,7 +102,7 @@ public class IngredientServiceImpl implements IngredientService {
     public Mono<Void> deleteByRecipeIdAndIngredientId(String recipeId, String id) {
         Recipe recipe = recipeReactiveRepository.findById(recipeId).block();
 
-        if(recipe == null) {
+         if(recipe == null) {
             throw new RuntimeException("RECIPE NOT FOUND!");
         }
 

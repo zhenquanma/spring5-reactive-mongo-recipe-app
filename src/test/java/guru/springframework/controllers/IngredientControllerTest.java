@@ -58,7 +58,7 @@ public class IngredientControllerTest {
         RecipeCommand command = new RecipeCommand();
 
         //when
-        when(recipeService.findCommandById(anyString())).thenReturn(command);
+        when(recipeService.findCommandById(anyString())).thenReturn(Mono.just(command));
 
         //then
         mockMvc.perform(get("/recipe/1/ingredients"))
