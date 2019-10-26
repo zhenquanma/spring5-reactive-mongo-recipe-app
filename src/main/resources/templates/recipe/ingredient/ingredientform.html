@@ -19,21 +19,32 @@
 <div class="container-fluid" style="margin-top: 20px; margin-bottom: 20px">
     <div class="row">
         <div class="col-md-8 offset-md-2">
+            <!--/*@thymesVar id="ingredient" type="guru.springframework.commands.IngredientCommand"*/-->
             <form  th:object="${ingredient}" th:action="@{'/recipe/' + ${ingredient.recipeId} + '/ingredient'} " method="post">
+
+                <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                    <p>Please Correct Errors Below</p>
+                </div>
+
+
+                <input type="hidden" th:field="*{recipeId}"/>
                 <input type="hidden" th:field="*{id}"/>
-                    <div class="card">
+
+                <div class="card">
                         <div class="card-header bg-primary text-white">
                             <h1 class="card-text">Edit Ingredient Information</h1>
                         </div>
                         <div class="card-body">
 
                             <div class="row">
-                                <div class="col-md-3 form-group">
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('description')}
+                                ? 'col-md-3 form-group has-error' : 'col-md-3 form-group'">
                                     <label>Description:</label>
                                     <input type="text" class="form-control" th:field="*{description}"/>
                                 </div>
 
-                                <div class="col-md-3 form-group">
+                                <div class="col-md-3 form-group"  th:class="${#fields.hasErrors('amount')}
+                                ? 'col-md-3 form-group has-error' : 'col-md-3 form-group'">
                                     <label>Amount:</label>
                                     <input type="number" class="form-control" th:field="*{amount}"/>
                                 </div>
