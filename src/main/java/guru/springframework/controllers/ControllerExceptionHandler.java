@@ -2,26 +2,25 @@ package guru.springframework.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.support.WebExchangeBindException;
+
 
 @Slf4j
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(NumberFormatException.class)
-    public ModelAndView numberFormatErrorHandler(Exception e) {
+    @ExceptionHandler(WebExchangeBindException.class)
+    public String numberFormatErrorHandler(Exception e, Model model) {
         log.error("Bad request with number format exception");
         log.error(e.getMessage());
 
-        ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("exception", e);
 
-        modelAndView.setViewName("400error");
-        modelAndView.addObject("exception", e);
-
-        return modelAndView;
+        return "400error";
     }
 }

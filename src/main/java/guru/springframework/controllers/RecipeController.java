@@ -9,10 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +20,10 @@ import java.util.List;
 @RequestMapping("/recipe")
 public class RecipeController {
 
-    RecipeService recipeService;
-    CategoryService categoryService;
+    private RecipeService recipeService;
+    private CategoryService categoryService;
+
+    private WebDataBinder webDataBinder;
 
     private static final String RECIPE_RECIPEFORM_URL = "recipe/recipeform";
 
@@ -31,11 +32,16 @@ public class RecipeController {
         this.categoryService = categoryService;
     }
 
+    @InitBinder
+    public void initBinder(WebDataBinder webDataBinder) {
+        this.webDataBinder = webDataBinder;
+    }
+
 
     @GetMapping("/{id}/show")
     public String showById(@PathVariable String id, Model model){
 
-        model.addAttribute("recipe", recipeService.findById(id).block());
+        model.addAttribute("recipe", recipeService.findById(id));
 
         return "recipe/show";
     }
@@ -55,6 +61,7 @@ public class RecipeController {
 
     @GetMapping("/{id}/update")
     public String updateRecipe(@PathVariable String id, Model model){
+//        Mono<RecipeCommand> recipeCommandMono = recipeService.findCommandById(id);
         RecipeCommand recipe = recipeService.findCommandById(id).block();
         List<String> categoryIds = new ArrayList<>();
         recipe.getCategories().iterator().forEachRemaining(category -> categoryIds.add(category.getId()));
@@ -70,9 +77,12 @@ public class RecipeController {
     }
 
     @PostMapping({"/",""})
-    public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand command,
-                               BindingResult bindingResult,
+    public String saveOrUpdate(@ModelAttribute("recipe") RecipeCommand command,
                                @RequestParam("categoryId") String[] categoryId) {
+
+        webDataBinder.validate();
+        BindingResult bindingResult = webDataBinder.getBindingResult();
+
         if(bindingResult.hasErrors()){
             bindingResult.getAllErrors()
                     .forEach(e -> log.debug(e.toString()));
@@ -98,16 +108,13 @@ public class RecipeController {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
-    public ModelAndView notFoundHandler(Exception e) {
+    public String notFoundHandler(Exception e, Model model) {
         log.error("Handling not found exception");
         log.error(e.getMessage());
 
-        ModelAndView modelAndView = new ModelAndView();
+        model.addAttribute("exception", e);
 
-        modelAndView.setViewName("404error");
-        modelAndView.addObject("exception", e);
-
-        return modelAndView;
+        return "404error";
     }
 
 }
